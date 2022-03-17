@@ -3,7 +3,6 @@ package core
 import chisel3._
 import chisel3.util._
 import chisel3.stage.ChiselStage
-import chisel3.experimental.ChiselEnum
 
 class WildcatCore() extends Module {
     /* outline
@@ -32,46 +31,75 @@ class WildcatCore() extends Module {
             >implement load/store
             >working CPU?
     */
-   /*val io = IO(new Bundle {
+   val io = IO(new Bundle {
      /* I wonder if we can implement PC through this */
-        val out = Output(UInt(24.W))
-   })*/
-   object Opcode extends ChiselEnum {
-       /* arithmetic */
-       val add = Value(0.U)
-       val addi = Value(1.U)
-       val sub = Value(2.U)
-       val subi = Value(3.U)
-       val mul = Value(4.U)
-       val div = Value(5.U)
-       val mod = Value(6.U)
-       /* load/store */
-       val mov = Value(7.U)
-       val ldi = Value(8.U)
-       val sto = Value(9.U)
-       val ld = Value(10.U)
-       /* boolean */
-       val and = Value(11.U)
-       val or = Value(12.U)
-       val xor = Value(13.U)
-       val not = Value(14.U)
-       /* conditional */
-       val gre = Value(15.U)
-       val les = Value(16.U)
-       val equ = Value(17.U)
-       /* branch */
-       val jmp = Value(18.U)
-       val skp = Value(19.U)
-   }
-
-   val pc = Reg(UInt(24.W)) /* this is a 24-bit core */
-   val status = Reg(Bool()) /* one flag, for "previous cond pass", i guess */
+        val boot = Input(Bool())
+        val is_write = Input(Bool())
+        val write_addr = Input(UInt(24.W))
+        val write_data = Input(UInt(24.W))
+        val valid = Output(Bool())
+        val inst = Output(UInt(24.W))
+        /* debug outputs */
+        val pc = Output(UInt(14.W))
+        val imm = Output(UInt(14.W))
+        val src = Output(UInt(5.W))
+        val op = Output(UInt(5.W))
+   })
+   val pc = RegInit(0.U(14.W)) /* 2^14 is maximum size of mem */
+   val cond_pass = Reg(Bool()) /* one flag, for "previous cond pass", i guess */
    /* adding these as stub until needed
    val working_mem = Mem()
-   val program_mem = Mem()
    */
+   val program_mem = Mem(256, UInt(24.W))
 
-   /* decode logic */
-  
-   /* ... doing logic? */
+   val inst = program_mem(pc)
+   val imm = inst(23,10)
+   val src = inst(9,5)
+   val op = inst(4,0)
+   // here might eventually be a "write to memory" section
+   // we're not worrying about that now
+   when (io.is_write) {
+        program_mem(io.write_addr) := io.write_data
+        io.valid := true.B
+   } .elsewhen (io.boot) {
+        pc := 0.U
+        io.valid := true.B
+   } .otherwise {
+        when (op > 19.U) {
+            io.valid := false.B
+        } .otherwise {
+           /* decode instruction */
+            io.valid := true.B
+            switch(op) {
+                is (Opcode.add) {}
+                is (Opcode.addi) {}
+                is (Opcode.sub) {}
+                is (Opcode.subi) {}
+                is (Opcode.mul) {}
+                is (Opcode.div) {}
+                is (Opcode.mod) {}
+                is (Opcode.and) {}
+                is (Opcode.or) {}
+                is (Opcode.xor) {}
+                is (Opcode.not) {}
+                is (Opcode.gre) {}
+                is (Opcode.les) {}
+                is (Opcode.equ) {}
+                is (Opcode.mov) {}
+                is (Opcode.ldi) {}
+                is (Opcode.sto) {}
+                is (Opcode.ld) {}
+                is (Opcode.jmp) {}
+                is (Opcode.skp) {}
+            }
+        }
+        pc := pc + 1.U
+   } 
+   io.inst := inst 
+   io.pc := pc
+   io.imm := imm
+   io.src := src
+   io.op := op
+
+      
 }
