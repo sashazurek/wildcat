@@ -32,35 +32,35 @@ object Instructions {
     def SKP  = BitPat("b???????????????????10011") //19
 }
 
-object Opcode extends ChiselEnum {
+object Opcode {
 /*register-register*/
    /* arithmetic */
-   val add = Value(0.U)
-   val sub = Value(1.U)
-   val mul = Value(2.U)
-   val div = Value(3.U)
-   val mod = Value(4.U)
+   val add = 0.U
+   val sub = 1.U
+   val mul = 2.U
+   val div = 3.U
+   val mod = 4.U
    /* load/store */
-   val mov = Value(5.U)
+   val mov = 5.U
    /* boolean */
-   val and = Value(6.U)
-   val or = Value(7.U)
-   val xor = Value(8.U)
-   val not = Value(9.U)
+   val and = 6.U
+   val or = 7.U
+   val xor = 8.U
+   val not = 9.U
    /* conditional */
-   val gre = Value(10.U)
-   val les = Value(11.U)
-   val equ = Value(12.U)
+   val gre = 10.U
+   val les = 11.U
+   val equ = 12.U
 
 /* register-immediate */
    /* arithmetic */
-   val addi = Value(13.U)
-   val subi = Value(14.U)
+   val addi = 13.U
+   val subi = 14.U
    /* load/store */
-   val ldi = Value(15.U)
-   val sto = Value(16.U)
-   val ld = Value(17.U)
+   val ldi = 15.U
+   val sto = 16.U
+   val ld = 17.U
    /* branch */
-   val jmp = Value(18.U)
-   val skp = Value(19.U)
+   val jmp = 18.U
+   val skp = 19.U
 }
