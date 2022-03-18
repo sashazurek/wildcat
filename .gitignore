@@ -1,5 +1,13 @@
 ### Project Specific stuff
 test_run_dir/*
+.vscode/*
+.bsp/*
+.bloop/*
+project/.bloop
+.metals
+metals.sbt
+bloop.settings.json
+wildcat-build-build.json
 ### XilinxISE template
 # intermediate build files
 *.bgn
