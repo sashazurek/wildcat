@@ -126,4 +126,44 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.clock.step(1)
     }
   }
+  it should "test arithmetic instructions" in {
+      test(new WildcatCore()) { c => 
+        /* seed some values */
+      write_ins(c, 0.U, 157773.U) // ADDI r2 0h9A
+      write_ins(c, 1.U, 2093.U) // ADDI r1 0h2
+      write_ins(c, 2.U, 2080.U) // ADD r2 r1
+      write_ins(c, 3.U, 2081.U) // SUB r2 r1
+      write_ins(c, 4.U, 2082.U) // MUL r2 r1
+      write_ins(c, 5.U, 2083.U) // DIV r2 r1
+      write_ins(c, 6.U, 2084.U) // MOD r2 r1
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(2) // seed the registers
+      // test add: expect 156
+      println("ADD r2 r1")
+      println(c.io.inst.peek())
+      println(c.io.op.peek())
+      println(c.io.imm.peek())
+      println(c.io.src.peek())
+      c.io.valid.expect(true.B)
+      c.io.result.expect(156.U)
+      c.clock.step(1)
+      // test sub: expect 154
+      c.io.valid.expect(true.B)
+      c.io.result.expect(154.U)
+      c.clock.step(1)
+      // test mul: expect 308
+      c.io.valid.expect(true.B)
+      c.io.result.expect(308.U)
+      c.clock.step(1)
+      // test div: expect 154
+      c.io.valid.expect(true.B)
+      c.io.result.expect(154.U)
+      c.clock.step(1)
+      // test mod: expect 0
+      c.io.valid.expect(true.B)
+      c.io.result.expect(0.U)
+              
+    }
+  }
 }

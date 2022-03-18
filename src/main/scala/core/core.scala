@@ -106,21 +106,47 @@ class WildcatCore() extends Module {
       imm is destination register
          */
       }.otherwise {
-        // check write register for 0
-        switch(op) {
-          is(Opcode.add) {}
-          is(Opcode.sub) {}
-          is(Opcode.mul) {}
-          is(Opcode.div) {}
-          is(Opcode.mod) {}
-          is(Opcode.and) {}
-          is(Opcode.or) {}
-          is(Opcode.xor) {}
-          is(Opcode.not) {}
-          is(Opcode.gre) {}
-          is(Opcode.les) {}
-          is(Opcode.equ) {}
-          is(Opcode.mov) {}
+        /* check for invalid registers
+        ins format: $DEST := DEST op SRC
+        */
+        when((imm > 0.U) && (imm < 32.U) && (src < 32.U)){
+          switch(op) {
+            is(Opcode.add) {
+              val res = reg(imm) + reg(src) 
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.sub) {
+              val res = reg(imm) - reg(src) 
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.mul) {
+              val res = reg(imm) * reg(src) 
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.div) {
+              val res = reg(imm) / reg(src) 
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.mod) {
+              val res = reg(imm) % reg(src) 
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.and) {}
+            is(Opcode.or) {}
+            is(Opcode.xor) {}
+            is(Opcode.not) {}
+            is(Opcode.gre) {}
+            is(Opcode.les) {}
+            is(Opcode.equ) {}
+            is(Opcode.mov) {}
+          }
+        }.otherwise {
+          io.valid := false.B
         }
       }
     }
