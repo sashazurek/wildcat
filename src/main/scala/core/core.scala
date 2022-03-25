@@ -143,7 +143,10 @@ class WildcatCore() extends Module {
             is(Opcode.gre) {}
             is(Opcode.les) {}
             is(Opcode.equ) {}
-            is(Opcode.mov) {}
+            is(Opcode.mov) {
+              reg(imm) := reg(src)
+              io.result := reg(src)
+            }
           }
         }.otherwise {
           io.valid := false.B

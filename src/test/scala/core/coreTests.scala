@@ -166,4 +166,17 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
               
     }
   }
+  it should "test mov instruction" in {
+    test(new WildcatCore()) {c => 
+      write_ins(c, 0.U, 5592109.U) // ADDI r1 0b1010101010101
+      write_ins(c, 1.U, 2085.U) // MOV r1 r2
+      write_ins(c, 2.U, 5592142.U) // SUBI r2 0b1010101010101
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(2)
+      c.io.result.expect(0.U)
+      }
+  }
+    }
+  }
 }
