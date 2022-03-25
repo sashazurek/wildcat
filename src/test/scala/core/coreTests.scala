@@ -177,6 +177,31 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.io.result.expect(0.U)
       }
   }
+  it should "test boolean instructions" in {
+    test(new WildcatCore()) { c =>
+      write_ins(c, 0.U, 5592109.U) // ADDI r1 0b1010101010101
+      write_ins(c, 1.U, 11184205.U) // ADDI r2 0b10101010101010
+      write_ins(c, 2.U, 3109.U) // MOV r1 r3
+      write_ins(c, 3.U, 4165.U) // MOV r2 r4
+      write_ins(c, 4.U, 4166.U) // AND r2 r4
+      write_ins(c, 5.U, 1095.U) // OR r2 r1
+      write_ins(c, 6.U, 5129.U) // NOT r5
+      write_ins(c, 7.U, 3112.U) // XOR r1 r3
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(4)
+      // AND
+      c.io.pc.expect(4.U)
+      c.io.result.expect(10922.U)
+      c.clock.step(1)
+      // OR
+      c.io.result.expect(16383.U)
+      c.clock.step(1)
+      // NOT
+      c.io.result.expect(16777215.U)
+      c.clock.step(1)
+      // XOR
+      c.io.result.expect(10922.U)
     }
   }
 }

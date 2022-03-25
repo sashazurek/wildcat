@@ -43,6 +43,7 @@ class WildcatCore() extends Module {
     val imm = Output(UInt(14.W))
     val src = Output(UInt(5.W))
     val op = Output(UInt(5.W))
+    val cond_pass = Output(Bool())
     val result = Output(UInt(24.W)) // output of last ins
   })
   val reg = Mem(32, UInt(24.W))
@@ -70,8 +71,6 @@ class WildcatCore() extends Module {
   }.otherwise {
     when(op > 19.U) {
       io.valid := false.B
-      // R0 should never be modified by spec
-      // unsure how to implement
     }.otherwise {
       /* decode instruction */
       io.valid := true.B
@@ -79,6 +78,7 @@ class WildcatCore() extends Module {
       when(op > 12.U) {
         switch(op) {
           is(Opcode.addi) {
+            // we only modify registers 1-31
             when(src > 0.U) {
               val res = reg(src) + imm
               reg(src) := res
@@ -136,10 +136,26 @@ class WildcatCore() extends Module {
               reg(imm) := res
               io.result := res
             }
-            is(Opcode.and) {}
-            is(Opcode.or) {}
-            is(Opcode.xor) {}
-            is(Opcode.not) {}
+            is(Opcode.and) {
+              val res = reg(imm) & reg(src)
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.or) {
+              val res = reg(imm) | reg(src)
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.xor) {
+              val res = reg(imm) ^ reg(src)
+              reg(imm) := res
+              io.result := res
+            }
+            is(Opcode.not) {
+              val res = ~reg(imm)
+              reg(imm) := res
+              io.result := res
+            }
             is(Opcode.gre) {}
             is(Opcode.les) {}
             is(Opcode.equ) {}
@@ -161,5 +177,5 @@ class WildcatCore() extends Module {
   io.imm := imm
   io.src := src
   io.op := op
-
+  io.cond_pass := cond_pass
 }
