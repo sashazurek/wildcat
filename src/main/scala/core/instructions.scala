@@ -63,4 +63,6 @@ object Opcode {
    /* branch */
    val jmp = 18.U
    val skp = 19.U
+   val bsl = 20.U
+   val bsr = 21.U
 }

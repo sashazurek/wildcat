@@ -80,14 +80,18 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       write_ins(c, 18.U, 13074.U)
       //  skp
       write_ins(c, 19.U, 13075.U)
-      //  invalid
+      //  bsl
       write_ins(c, 20.U, 13076.U)
+      //  bsr
+      write_ins(c, 21.U, 13077.U)
+      //  invalid
+      write_ins(c, 22.U, 13078.U)
 
       // boot the CPU
       boot(c)
       c.io.boot.poke(false.B)
       // first 19 instructions should be valid
-      for (ins <- 0 until 20) {
+      for (ins <- 0 until 22) {
         println(c.io.pc.peek())
         println(c.io.inst.peek())
         c.io.valid.expect(true.B)
@@ -96,7 +100,7 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       }
       // last should be invalid
       c.io.valid.expect(false.B)
-      c.io.pc.expect(20.U)
+      c.io.pc.expect(22.U)
     }
   }
   it should "test imm arithmetic instructions" in {

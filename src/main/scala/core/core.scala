@@ -69,7 +69,7 @@ class WildcatCore() extends Module {
     pc := 0.U
     io.valid := true.B
   }.otherwise {
-    when(op > 19.U) {
+    when(op > 21.U) {
       io.valid := false.B
     }.otherwise {
       /* decode instruction */
