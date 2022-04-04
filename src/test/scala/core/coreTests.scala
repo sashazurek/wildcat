@@ -208,4 +208,17 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.io.result.expect(10922.U)
     }
   }
+  it should "test bitshift instructions" in {
+    test(new WildcatCore()) { c =>
+        write_ins(c, 0.U, 3117.U) // ADDI r1 0d3
+        write_ins(c, 1.U, 1076.U) // BSL r1 0x1
+        write_ins(c, 2.U, 1077.U) // BSR r1 0x1
+        boot(c)
+        c.io.boot.poke(false.B)
+        c.clock.step(1)
+        c.io.result.expect(6.U)
+        c.clock.step(1)
+        c.io.result.expect(3.U)
+    }
+  }
 }
