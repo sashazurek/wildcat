@@ -101,6 +101,16 @@ class WildcatCore() extends Module {
           is(Opcode.ld) {}
           is(Opcode.jmp) {}
           is(Opcode.skp) {}
+          is(Opcode.bsl) {
+            val res = reg(src) << imm
+            reg(src) := res
+            io.result := res
+          }
+          is(Opcode.bsr) {
+            val res = reg(src) >> imm
+            reg(src) := res
+            io.result := res
+          }
         }
         /* register-register
       imm is destination register
