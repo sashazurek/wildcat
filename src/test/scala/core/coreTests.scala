@@ -221,4 +221,21 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
         c.io.result.expect(3.U)
     }
   }
+  it should "test conditional instructions" in {
+    test(new WildcatCore()) { c => 
+      write_ins(c, 0.U, 1069.U) // ADDI r1 0d1  
+      write_ins(c, 1.U, 2125.U) // ADDI r2 0d2  
+      write_ins(c, 2.U, 2090.U) // GRE r1 r2
+      write_ins(c, 3.U, 2091.U) // LES r1 r2
+      write_ins(c, 4.U, 2092.U) // EQU r1 r2
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(3)
+      c.io.cond_pass.expect(1.U)
+      c.clock.step(1)
+      c.io.cond_pass.expect(0.U)
+      c.clock.step(1)
+      c.io.cond_pass.expect(0.U)
+    }
+  }
 }

@@ -43,13 +43,13 @@ class WildcatCore() extends Module {
     val imm = Output(UInt(14.W))
     val src = Output(UInt(5.W))
     val op = Output(UInt(5.W))
-    val cond_pass = Output(Bool())
+    val cond_pass = Output(UInt(24.W))
     val result = Output(UInt(24.W)) // output of last ins
   })
   val reg = Mem(32, UInt(24.W))
   reg(0) := 0.U
   val pc = RegInit(0.U(14.W)) /* 2^14 is maximum size of mem */
-  val cond_pass = Reg(Bool()) /* one flag, for "previous cond pass", i guess */
+  val cond_pass = Reg(UInt(24.W)) /* one flag, for "previous cond pass", i guess */
   /* adding these as stub until needed
    val working_mem = Mem()
    */
@@ -166,9 +166,18 @@ class WildcatCore() extends Module {
               reg(imm) := res
               io.result := res
             }
-            is(Opcode.gre) {}
-            is(Opcode.les) {}
-            is(Opcode.equ) {}
+            is(Opcode.gre) {
+              // imm > src
+              cond_pass := reg(imm) > reg(src)
+            }
+            is(Opcode.les) {
+              // imm < src
+              cond_pass := reg(imm) < reg(src)
+            }
+            is(Opcode.equ) {
+              // imm = src
+              cond_pass := reg(imm) === reg(src)
+            }
             is(Opcode.mov) {
               reg(imm) := reg(src)
               io.result := reg(src)
@@ -184,8 +193,8 @@ class WildcatCore() extends Module {
   /* filling out debug outputs */
   io.inst := inst
   io.pc := pc
-  io.imm := imm
-  io.src := src
+  io.imm := reg(imm)
+  io.src := reg(src)
   io.op := op
   io.cond_pass := cond_pass
 }
