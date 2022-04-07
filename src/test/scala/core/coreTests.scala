@@ -76,7 +76,7 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       //  equ
       write_ins(c, 17.U, 13068.U)
       //  jmp
-      write_ins(c, 18.U, 13074.U)
+      write_ins(c, 18.U, 20242.U)
       //  skp
       write_ins(c, 19.U, 13075.U)
       //  bsl
@@ -255,6 +255,17 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       // r1 should be 2, not 3 
       c.io.pc.expect(6.U)
       c.io.src.expect(2.U)
+    }
+  }
+  it should "test jump instruction" in {
+    test(new WildcatCore()) { c =>
+      write_ins(c, 0.U, 102418.U) // JMP 0d100  
+      write_ins(c, 100.U, 45.U) // ADDI r1 0d0  
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(1)
+      c.io.inst.expect(45.U)
+      c.io.pc.expect(100.U)
     }
   }
 }

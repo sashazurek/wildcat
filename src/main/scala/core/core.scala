@@ -98,7 +98,7 @@ class WildcatCore() extends Module {
           is(Opcode.ldi) {}
           is(Opcode.sto) {}
           is(Opcode.ld) {}
-          is(Opcode.jmp) {}
+          // is(Opcode.jmp) {}
           is(Opcode.bsl) {
             val res = reg(src) << imm
             reg(src) := res
@@ -189,6 +189,8 @@ class WildcatCore() extends Module {
     // skip/jump logic
     when(op === Opcode.skp){
       pc := pc + 1.U + cond_pass
+    }.elsewhen(op === Opcode.jmp) {
+      pc := imm
     }.otherwise{pc := pc + 1.U}
     
   }
