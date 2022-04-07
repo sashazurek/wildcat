@@ -100,7 +100,6 @@ class WildcatCore() extends Module {
           is(Opcode.sto) {}
           is(Opcode.ld) {}
           is(Opcode.jmp) {}
-          is(Opcode.skp) {}
           is(Opcode.bsl) {
             val res = reg(src) << imm
             reg(src) := res
@@ -188,7 +187,11 @@ class WildcatCore() extends Module {
         }
       }
     }
-    pc := pc + 1.U
+    // skip logic
+    when(op === Opcode.skp){
+      pc := pc + 1.U + cond_pass
+    }.otherwise{pc := pc + 1.U}
+    
   }
   /* filling out debug outputs */
   io.inst := inst

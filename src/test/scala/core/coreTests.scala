@@ -32,8 +32,7 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       write_ins(c, 0.U, 13056.U)
       // do that instruction
       // partially tests decoding, too
-      c.io.is_write.poke(false.B)
-      c.io.boot.poke(true.B)
+      boot(c)
       c.io.inst.expect(13056.U)
       c.io.valid.expect(true.B)
     }
@@ -236,6 +235,26 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.io.cond_pass.expect(0.U)
       c.clock.step(1)
       c.io.cond_pass.expect(0.U)
+    }
+  }
+  it should "test skip instruction" in {
+    test(new WildcatCore()) { c =>
+      write_ins(c, 0.U, 1069.U) // ADDI r1 0d1  
+      write_ins(c, 1.U, 1069.U) // ADDI r1 0d1  
+      write_ins(c, 2.U, 2125.U) // ADDI r2 0d2  
+      write_ins(c, 3.U, 2092.U) // EQU r1 r2
+      write_ins(c, 4.U, 19.U) // SKP
+      write_ins(c, 5.U, 1069.U) // ADDI r1 0d1  
+      write_ins(c, 6.U, 45.U) // ADDI r1 0d0  
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(4)
+      // the skip
+      c.io.cond_pass.expect(1.U)
+      c.clock.step(1)
+      // r1 should be 2, not 3 
+      c.io.pc.expect(6.U)
+      c.io.src.expect(2.U)
     }
   }
 }
