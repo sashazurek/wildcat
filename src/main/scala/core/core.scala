@@ -43,13 +43,13 @@ class WildcatCore() extends Module {
     val imm = Output(UInt(14.W))
     val src = Output(UInt(5.W))
     val op = Output(UInt(5.W))
-    val cond_pass = Output(UInt(24.W))
+    val cond_pass = Output(UInt(1.W))
     val result = Output(UInt(24.W)) // output of last ins
   })
   val reg = Mem(32, UInt(24.W))
   reg(0) := 0.U
   val pc = RegInit(0.U(14.W)) /* 2^14 is maximum size of mem */
-  val cond_pass = Reg(UInt(24.W)) /* one flag, for "previous cond pass", i guess */
+  val cond_pass = Reg(UInt(1.W)) /* one flag, for "previous cond pass", i guess */
   /* adding these as stub until needed
    val working_mem = Mem()
    */
@@ -60,15 +60,14 @@ class WildcatCore() extends Module {
   val src = inst(9, 5)
   val op = inst(4, 0)
   io.result := 127.U
-  // here might eventually be a "write to memory" section
-  // we're not worrying about that now
-  when(io.is_write) {
+  // decision tree
+  when(io.is_write) { // writing an instruction to pmem
     program_mem(io.write_addr) := io.write_data
     io.valid := true.B
-  }.elsewhen(io.boot) {
+  }.elsewhen(io.boot) { // boot the cpu
     pc := 0.U
     io.valid := true.B
-  }.otherwise {
+  }.otherwise { // we have an instruction
     when(op > 21.U) {
       io.valid := false.B
     }.otherwise {
@@ -187,7 +186,7 @@ class WildcatCore() extends Module {
         }
       }
     }
-    // skip logic
+    // skip/jump logic
     when(op === Opcode.skp){
       pc := pc + 1.U + cond_pass
     }.otherwise{pc := pc + 1.U}
