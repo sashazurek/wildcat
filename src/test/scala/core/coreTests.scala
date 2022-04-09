@@ -1,6 +1,7 @@
 package core
 
 import chisel3._
+import chisel3.stage.ChiselStage
 import chisel3.util._
 import chiseltest._
 import org.scalatest.flatspec.AnyFlatSpec
@@ -294,4 +295,6 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.io.src.expect(1024.U)
     }
   }
+  // uncomment this line to emit the Verilog output
+  // (new ChiselStage).emitVerilog(new WildcatCore)
 }
