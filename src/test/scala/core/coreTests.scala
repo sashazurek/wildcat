@@ -268,4 +268,30 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.io.pc.expect(100.U)
     }
   }
+  it should "test ld/sto instructions" in {
+    test(new WildcatCore()) { c => 
+      write_ins(c, 0.U, 1069.U) // ADDI r1 0d1  
+      write_ins(c, 1.U, 1072.U) // STO r1 0d1
+      write_ins(c, 2.U, 1105.U) // LD r2 0d1
+      write_ins(c, 3.U, 77.U) // ADDI r2 0d0
+      boot(c)
+      println("ld/sto")
+      c.io.boot.poke(false.B)
+      c.clock.step(1)
+      c.io.src.expect(1.U)
+      c.clock.step(2)
+      c.io.src.expect(1.U)
+    }
+  }
+  it should "test ldi instruction" in {
+    test(new WildcatCore()) { c =>
+      write_ins(c, 0.U, 1048911.U) // LDI 0d10 0d1024  
+      write_ins(c, 1.U, 10289.U) // LD r1 0d10
+      write_ins(c, 2.U, 45.U) // ADDI r1 0d0
+      boot(c)
+      c.io.boot.poke(false.B)
+      c.clock.step(2)
+      c.io.src.expect(1024.U)
+    }
+  }
 }
