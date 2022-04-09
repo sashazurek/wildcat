@@ -295,6 +295,29 @@ class CoreTest extends AnyFlatSpec with ChiselScalatestTester {
       c.io.src.expect(1024.U)
     }
   }
+
+  it should "test fibonacci sequence" in {
+    test(new WildcatCore()) { c =>
+      write_ins(c,0.U,6189.U) // ADDI r1 0d6  
+      write_ins(c,1.U,1997.U) // ADDI r30, 0d1
+      write_ins(c,2.U,1070.U) // fib: SUBI r1 0x1
+      write_ins(c,3.U,32704.U) // ADD r30 r31
+      write_ins(c,4.U,30693.U) // MOV r31 r29
+      write_ins(c,5.U,32709.U) // MOV r30 r31
+      write_ins(c,6.U,31653.U) // MOV r29 r30
+      write_ins(c,7.U,2092.U) // EQU r1, r0
+      write_ins(c,8.U,19.U) // SKP
+      write_ins(c,9.U,2066.U) // JMP fib
+      write_ins(c,10.U,941.U) // ADDI r29 0d0
+      boot(c)
+      c.io.boot.poke(false.B)
+      for(ins <- 0 until 49) {
+        c.clock.step(1)
+      }
+      c.io.pc.expect(10.U)
+      c.io.src.expect(13.U)
+    }
+  }
   // uncomment this line to emit the Verilog output
   // (new ChiselStage).emitVerilog(new WildcatCore)
 }
